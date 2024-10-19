@@ -5,8 +5,7 @@ const srcDir = path.join(__dirname, "..", "src");
 
 module.exports = {
   entry: {
-    popup: path.join(srcDir, "popup.tsx"),
-    sidepanel: path.join(srcDir, "sidepanel.tsx"),
+    sidebar: path.join(srcDir, "sidebar.tsx"),
     options: path.join(srcDir, "options.tsx"),
     "service-worker": path.join(srcDir, "service-worker.ts"),
     content_script: path.join(srcDir, "content_script.tsx"),
@@ -15,14 +14,7 @@ module.exports = {
     path: path.join(__dirname, "../dist/js"),
     filename: "[name].js",
   },
-  optimization: {
-    splitChunks: {
-      name: "vendor",
-      chunks(chunk) {
-        return chunk.name !== "background";
-      },
-    },
-  },
+  devtool: "source-map",
   module: {
     rules: [
       {
@@ -30,10 +22,14 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: [".ts", ".tsx", ".js", ".css"],
   },
   plugins: [
     new CopyPlugin({
