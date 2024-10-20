@@ -1,60 +1,51 @@
-import { Agent, ContextMenuEvent } from "./models";
 import AgentService from "./agents/service";
-
+import { SET_CONTEXT_SELECTION_MODE, CONTEXT_SELECTED } from "./messages";
 class BackgroundService {
   private agentsService: AgentService;
 
   constructor(agentsService: AgentService) {
     this.agentsService = agentsService;
-    this.setupContextMenus();
+    this.setupListeners();
   }
 
-  private setupContextMenus() {
-    chrome.contextMenus.create({
-      id: "addPageContext",
-      title: "Add page as context",
-      contexts: ["page"],
-    });
+  async getCurrentTab() {
+    let queryOptions = { active: true, lastFocusedWindow: true };
+    // `tab` will either be a `tabs.Tab` instance or `undefined`.
+    let [tab] = await chrome.tabs.query(queryOptions);
+    return tab;
+  }
 
-    chrome.contextMenus.create({
-      id: "addSelectionContext",
-      title: "Add selection as context",
-      contexts: ["selection"],
-    });
+  private setupListeners() {
+    // add a listener for messages from the sidebar
+    // when user clicks add context in the sidebar, it will send a message here
+    // at this page will be in a state so that the user can select the context
+    console.log("service worker setup listeners");
 
-    chrome.contextMenus.onClicked.addListener((info, tab) => {
-      if (tab && tab.id) {
-        if (info.menuItemId === "addPageContext") {
-          this.handleContextMenuEvent({
-            type: "pageContext",
-            data: tab.url || "",
-            url: tab.url || "",
-          });
-        } else if (info.menuItemId === "addSelectionContext") {
-          chrome.tabs.sendMessage(
-            tab.id,
-            { action: "getSelection" },
-            (response) => {
-              this.handleContextMenuEvent({
-                type: "selectionContext",
-                data: response.selection,
-                url: tab.url || "",
+    chrome.runtime.onMessage.addListener(
+      async (message, sender, sendResponse) => {
+        console.log("service worker got message", message);
+
+        switch (message.action) {
+          case SET_CONTEXT_SELECTION_MODE:
+            // dispatch to the active tab
+            const activeTab = await this.getCurrentTab();
+            console.log("service worker got active tab", activeTab);
+            if (activeTab && activeTab.id) {
+              console.log("service worker sending message to content script");
+              chrome.tabs.sendMessage(activeTab.id, {
+                action: SET_CONTEXT_SELECTION_MODE,
               });
             }
-          );
+            break;
+          case CONTEXT_SELECTED:
+            console.log("service worker got context selected", message.context);
+            break;
+          default:
+            console.log("service worker got unknown message", message);
+            break;
         }
       }
-    });
-  }
-
-  private handleContextMenuEvent(event: ContextMenuEvent) {
-    // Here you would typically update the relevant agent or task with the new context
-    console.log("Context menu event:", event);
-    // For example:
-    // const relevantAgent = this.agents.find(agent => agent.needsContext(event.type));
-    // if (relevantAgent) {
-    //   relevantAgent.addContext(event);
-    // }
+    );
   }
 }
 

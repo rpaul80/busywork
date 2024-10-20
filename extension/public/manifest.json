@@ -3,14 +3,21 @@
   "name": "AI Assistant Chrome Extension",
   "version": "1.0",
   "description": "Chrome extension with AI-powered assistants",
-  "permissions": ["storage", "activeTab", "contextMenus", "sidePanel"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "contextMenus",
+    "sidePanel",
+    "scripting"
+  ],
   "background": {
     "service_worker": "js/service-worker.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["js/content_script.js"]
+      "js": ["js/content_script.js"],
+      "css": ["css/content_styles.css"]
     }
   ],
   "action": {

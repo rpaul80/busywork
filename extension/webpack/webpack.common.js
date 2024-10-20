@@ -9,6 +9,7 @@ module.exports = {
     options: path.join(srcDir, "options.tsx"),
     "service-worker": path.join(srcDir, "service-worker.ts"),
     content_script: path.join(srcDir, "content_script.tsx"),
+    content_styles: path.join(srcDir, "content_styles.css"),
   },
   output: {
     path: path.join(__dirname, "../dist/js"),
@@ -33,7 +34,10 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: ".", to: "../", context: "public" }],
+      patterns: [
+        { from: ".", to: "../", context: "public" },
+        { from: "*.css", to: "../css", context: srcDir },
+      ],
       options: {},
     }),
   ],
