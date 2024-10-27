@@ -1,5 +1,5 @@
 // when receiving a message with action setContextSelectionMode, we need to update the current tab visually so that the user knows that they are in context selection mode
-import { CONTEXT_SELECTED } from './messages';
+import { SET_CONTEXT_SELECTION_MODE, CONTEXT_SELECTED } from './messages';
 
 console.log("content script adding listeners");
 
@@ -16,7 +16,8 @@ function injectCSS() {
 injectCSS();
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'setContextSelectionMode') {
+    console.log("content script got message", message);
+    if (message.action === SET_CONTEXT_SELECTION_MODE) {
         console.log("active tab -- setting context selection mode");
         enableContextSelectionMode();
     }

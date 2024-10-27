@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Agent, AgentTask, Context } from './models';
 import AgentService from './agents/service';
-import { SET_CONTEXT_SELECTION_MODE } from './messages';
+import { AGENT_CONTEXT_SELECTION_MODE_REQUESTED, AGENT_CONTEXT_SELECTION_MODE_COMPLETED } from './messages';
 import './sidebar.css';
 import { createRoot } from 'react-dom/client';
 
@@ -57,21 +57,23 @@ const AgentList: React.FC = () => {
     }
 
     const handleAddContext = (contextId: string) => {
-        // Here you would typically start the context selection process
-        console.log(`Starting context selection for context: ${contextId}`);
 
         // send a message to the service worker to start the context selection process
         chrome.runtime.sendMessage({
-            action: SET_CONTEXT_SELECTION_MODE,
+            action: AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
             contextId: contextId
         });
 
-        // For now, we'll just toggle the isSatisfied state
-        setContexts(prevContexts =>
-            prevContexts.map(context =>
-                context.id === contextId ? { ...context, isSatisfied: !context.isSatisfied } : context
-            )
-        );
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            console.log("sidebar got message", message);
+            if (message.action === AGENT_CONTEXT_SELECTION_MODE_COMPLETED) {
+                setContexts(prevContexts =>
+                    prevContexts.map(context =>
+                        context.id === contextId ? { ...context, isSatisfied: true } : context
+                    )
+                );
+            }
+        });
     };
 
     const renderContextDetails = (context: ContextWithStatus) => {

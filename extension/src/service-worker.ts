@@ -1,5 +1,10 @@
 import AgentService from "./agents/service";
-import { SET_CONTEXT_SELECTION_MODE, CONTEXT_SELECTED } from "./messages";
+import {
+  AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
+  AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
+  SET_CONTEXT_SELECTION_MODE,
+  CONTEXT_SELECTED,
+} from "./messages";
 class BackgroundService {
   private agentsService: AgentService;
 
@@ -26,8 +31,8 @@ class BackgroundService {
         console.log("service worker got message", message);
 
         switch (message.action) {
-          case SET_CONTEXT_SELECTION_MODE:
-            // dispatch to the active tab
+          case AGENT_CONTEXT_SELECTION_MODE_REQUESTED:
+            // dispatch to the conten script in the active tab
             const activeTab = await this.getCurrentTab();
             console.log("service worker got active tab", activeTab);
             if (activeTab && activeTab.id) {
@@ -39,6 +44,12 @@ class BackgroundService {
             break;
           case CONTEXT_SELECTED:
             console.log("service worker got context selected", message.context);
+
+            // send a message back to the sidebar to let it know that the context has been selected
+            chrome.runtime.sendMessage({
+              action: AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
+              context: message.context,
+            });
             break;
           default:
             console.log("service worker got unknown message", message);
