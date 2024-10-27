@@ -1,5 +1,6 @@
 import React from "react";
 import { ContextWithStatus } from "../models";
+import { contextService } from '../services/ContextService';
 
 interface ContextListProps {
     contexts: ContextWithStatus[];
@@ -7,26 +8,24 @@ interface ContextListProps {
 }
 
 const renderContextDetails = (context: ContextWithStatus, onAddContext: (contextId: string) => void) => {
-    const label = () => {
-        if (context.state === "empty") {
-            return "Add Context";
-        } else if (context.state === "selecting") {
-            return "Select Context";
-        } else {
-            return "Clear Context";
-        }
-    }
     return (
         <div className="context-details">
             <h5>{context.name}</h5>
             <p>Type: {context.type}</p>
-            {context.state === "satisfied" && <div className="context-details-content">
-                <p>{context.data}</p>
-            </div>}
-            <button disabled={context.state === "selecting"} onClick={() => onAddContext(context.id)}>
-                {label()}
+            {contextService.isContextSatisfied(context) && (
+                <div className="context-details-content">
+                    <p>{context.data}</p>
+                </div>
+            )}
+            <button
+                disabled={contextService.isContextButtonDisabled(context)}
+                onClick={() => onAddContext(context.id)}
+            >
+                {contextService.getContextLabel(context)}
             </button>
-            {context.state === "satisfied" && <span className="checkmark">✓ Context Added</span>}
+            {contextService.isContextSatisfied(context) && (
+                <span className="checkmark">✓ Context Added</span>
+            )}
         </div>
     );
 };
