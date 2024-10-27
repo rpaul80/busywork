@@ -1,4 +1,4 @@
-import AgentService from "./agents/service";
+import AgentService from "./services/AgentService";
 import {
   AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
   AGENT_CONTEXT_SELECTION_MODE_COMPLETED,

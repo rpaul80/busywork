@@ -1,6 +1,6 @@
 import { Agent } from "../models";
-import { ProjectManagerAgent } from "./projectmanager";
-import { ExecutiveAssistantAgent } from "./executiveassistant";
+import { ProjectManagerAgent } from "../agents/projectmanager";
+import { ExecutiveAssistantAgent } from "../agents/executiveassistant";
 
 export default class AgentService {
   private agents: Agent[] = [];

@@ -1,42 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Agent, AgentTask, ContextWithStatus } from '../models';
-import AgentService from '../agents/service';
 import { AGENT_CONTEXT_SELECTION_MODE_REQUESTED, AGENT_CONTEXT_SELECTION_MODE_COMPLETED } from '../messages';
 import './sidebar.css';
 import { createRoot } from 'react-dom/client';
 import { useMessageListener } from '../hooks/useMessagesListener';
+import { useAgents } from '../hooks/useAgents';
 import TaskList from './TaskList';
 import ContextList from './ContextList';
 import { Loading } from './common/Loading';
 import { Error } from './common/Error';
 
 const AgentList: React.FC = () => {
-    const [agents, setAgents] = useState<Agent[]>([]);
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [selectedTask, setSelectedTask] = useState<AgentTask | null>(null);
     const [contexts, setContexts] = useState<ContextWithStatus[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const service = new AgentService();
-
     const [selectingContextId, setSelectingContextId] = useState<string | undefined>();
     useMessageListener(selectingContextId, setContexts);
-
-    useEffect(() => {
-        const fetchAgents = async () => {
-            try {
-                setIsLoading(true);
-                const fetchedAgents = service.getAgents();
-                setAgents(fetchedAgents);
-                setIsLoading(false);
-            } catch (err) {
-                setError('Failed to fetch agents. Please try again later.');
-                setIsLoading(false);
-            }
-        };
-
-        fetchAgents();
-    }, []);
+    const { agents, isLoading, error } = useAgents();
 
     const handleAgentClick = (agent: Agent) => {
         setSelectedAgent(agent);
