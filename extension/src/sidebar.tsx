@@ -6,7 +6,7 @@ import './sidebar.css';
 import { createRoot } from 'react-dom/client';
 
 interface ContextWithStatus extends Context {
-    isSatisfied: boolean;
+    state: "empty" | "selecting" | "satisfied"
 }
 
 const AgentList: React.FC = () => {
@@ -36,16 +36,13 @@ const AgentList: React.FC = () => {
 
     const handleAgentClick = (agent: Agent) => {
         setSelectedAgent(agent);
-        console.log(agent.tasks);
         setSelectedTask(null);
         setContexts([]);
     };
 
     const handleTaskClick = (task: AgentTask | null) => {
-        console.log("task", task);
         setSelectedTask(task);
-        console.log(task?.requiredContexts);
-        setContexts(task?.requiredContexts.map(context => ({ ...context, isSatisfied: false })) || []);
+        setContexts(task?.requiredContexts.map(context => ({ ...context, state: "empty" })) || []);
     };
 
     if (isLoading) {
@@ -57,19 +54,24 @@ const AgentList: React.FC = () => {
     }
 
     const handleAddContext = (contextId: string) => {
-
         // send a message to the service worker to start the context selection process
         chrome.runtime.sendMessage({
             action: AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
             contextId: contextId
         });
 
+        setContexts(prevContexts =>
+            prevContexts.map(context =>
+                context.id === contextId ? { ...context, state: "selecting" } : context
+            )
+        );
+
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             console.log("sidebar got message", message);
             if (message.action === AGENT_CONTEXT_SELECTION_MODE_COMPLETED) {
                 setContexts(prevContexts =>
                     prevContexts.map(context =>
-                        context.id === contextId ? { ...context, isSatisfied: true } : context
+                        context.id === contextId ? { ...context, state: "satisfied", data: message.context } : context
                     )
                 );
             }
@@ -77,14 +79,27 @@ const AgentList: React.FC = () => {
     };
 
     const renderContextDetails = (context: ContextWithStatus) => {
+        const label = () => {
+            if (context.state === "empty") {
+                return "Add Context";
+            } else if (context.state === "selecting") {
+                return "Select Context";
+            } else {
+                return "Clear Context";
+            }
+        }
         return (
             <div className="context-details">
                 <h5>{context.name}</h5>
                 <p>Type: {context.type}</p>
-                <button onClick={() => handleAddContext(context.id)}>
-                    {context.isSatisfied ? 'Clear' : 'Add Context'}
+                {/* if we have the context (it's sqtisfied) make is visible to the user with a collapsible div */}
+                {context.state === "satisfied" && <div className="context-details-content">
+                    <p>{context.data}</p>
+                </div>}
+                <button disabled={context.state === "selecting"} onClick={() => handleAddContext(context.id)}>
+                    {label()}
                 </button>
-                {context.isSatisfied && <span className="checkmark">✓ Context Added</span>}
+                {context.state === "satisfied" && <span className="checkmark">✓ Context Added</span>}
             </div>
         );
     };
