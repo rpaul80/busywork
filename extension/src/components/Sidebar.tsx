@@ -7,6 +7,9 @@ import { createRoot } from 'react-dom/client';
 import { useMessageListener } from '../hooks/useMessagesListener';
 import TaskList from './TaskList';
 import ContextList from './ContextList';
+import { Loading } from './common/Loading';
+import { Error } from './common/Error';
+
 const AgentList: React.FC = () => {
     const [agents, setAgents] = useState<Agent[]>([]);
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
@@ -47,11 +50,11 @@ const AgentList: React.FC = () => {
     };
 
     if (isLoading) {
-        return <div className="loading">Loading agents...</div>;
+        return <Loading />
     }
 
     if (error) {
-        return <div className="error">{error}</div>;
+        return <Error message={error} />
     }
 
     const handleAddContext = (contextId: string) => {
