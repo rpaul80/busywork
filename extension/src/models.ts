@@ -37,3 +37,7 @@ export interface ContextMenuEvent {
   data: string;
   url: string;
 }
+
+export interface ContextWithStatus extends Context {
+  state: "empty" | "selecting" | "satisfied";
+}

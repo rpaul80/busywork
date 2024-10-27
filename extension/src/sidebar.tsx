@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Agent, AgentTask, Context } from './models';
+import { Agent, AgentTask, ContextWithStatus } from './models';
 import AgentService from './agents/service';
 import { AGENT_CONTEXT_SELECTION_MODE_REQUESTED, AGENT_CONTEXT_SELECTION_MODE_COMPLETED } from './messages';
 import './sidebar.css';
 import { createRoot } from 'react-dom/client';
+import { useMessageListener } from './hooks/useMessagesListener';
 
-interface ContextWithStatus extends Context {
-    state: "empty" | "selecting" | "satisfied"
-}
 
 const AgentList: React.FC = () => {
     const [agents, setAgents] = useState<Agent[]>([]);
@@ -17,6 +15,10 @@ const AgentList: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const service = new AgentService();
+
+    const [selectingContextId, setSelectingContextId] = useState<string | undefined>();
+    useMessageListener(selectingContextId, setContexts);
+
 
     useEffect(() => {
         const fetchAgents = async () => {
@@ -65,17 +67,7 @@ const AgentList: React.FC = () => {
                 context.id === contextId ? { ...context, state: "selecting" } : context
             )
         );
-
-        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-            console.log("sidebar got message", message);
-            if (message.action === AGENT_CONTEXT_SELECTION_MODE_COMPLETED) {
-                setContexts(prevContexts =>
-                    prevContexts.map(context =>
-                        context.id === contextId ? { ...context, state: "satisfied", data: message.context } : context
-                    )
-                );
-            }
-        });
+        setSelectingContextId(contextId);
     };
 
     const renderContextDetails = (context: ContextWithStatus) => {
@@ -92,7 +84,6 @@ const AgentList: React.FC = () => {
             <div className="context-details">
                 <h5>{context.name}</h5>
                 <p>Type: {context.type}</p>
-                {/* if we have the context (it's sqtisfied) make is visible to the user with a collapsible div */}
                 {context.state === "satisfied" && <div className="context-details-content">
                     <p>{context.data}</p>
                 </div>}
