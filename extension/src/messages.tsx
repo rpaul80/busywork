@@ -11,21 +11,24 @@ export const AGENT_CONTEXT_SELECTION_MODE_COMPLETED = "agentContextSelectionMode
 export const SET_CONTEXT_SELECTION_MODE = "setContextSelectionMode";
 export const CONTEXT_SELECTED = "contextSelected";
 
-export interface MessageAgentContextSelectionModeCompleted {
-    action: typeof AGENT_CONTEXT_SELECTION_MODE_COMPLETED;
+export interface MessageAgentContextSelectionModeCompleted extends BaseMessage<typeof AGENT_CONTEXT_SELECTION_MODE_COMPLETED> {
     context: ContextWithStatus;
 }
 
-export interface MessageAgentContextSelectionModeRequested {
-    action: typeof AGENT_CONTEXT_SELECTION_MODE_REQUESTED;
+export interface MessageAgentContextSelectionModeRequested extends BaseMessage<typeof AGENT_CONTEXT_SELECTION_MODE_REQUESTED> {
     contextId: string;
 }
 
-export interface MessageContextSelected {
-    action: typeof CONTEXT_SELECTED;
+export interface MessageContextSelected extends BaseMessage<typeof CONTEXT_SELECTED> {
     context: string;
 }
 
-export interface MessageSetContextSelectionMode {
-    action: typeof SET_CONTEXT_SELECTION_MODE;
+export interface MessageSetContextSelectionMode extends BaseMessage<typeof SET_CONTEXT_SELECTION_MODE> {
 }
+
+export interface BaseMessage<T extends string = string> {
+    action: T;
+    [key: string]: any;
+}
+
+export type MessageListener<T extends BaseMessage> = (message: T) => void;

@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import AgentService from "../services/AgentService";
 import { Agent } from "../models";
+
 export function useAgents() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const service = new AgentService();
+  const service = useMemo(() => new AgentService(), []);
 
   useEffect(() => {
     const fetchAgents = async () => {

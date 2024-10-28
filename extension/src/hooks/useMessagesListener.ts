@@ -1,8 +1,5 @@
 import { useEffect } from "react";
-import {
-  AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
-  MessageAgentContextSelectionModeCompleted,
-} from "../messages";
+import { AGENT_CONTEXT_SELECTION_MODE_COMPLETED } from "../messages";
 import { ContextWithStatus } from "../models";
 import { messagingService } from "../services/MessagingService";
 
@@ -15,7 +12,7 @@ export function useMessageListener(
 
     const unsubscribe = messagingService.subscribe(
       AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
-      (message: MessageAgentContextSelectionModeCompleted) => {
+      (message) => {
         setContexts((prevContexts) =>
           prevContexts.map((context) =>
             context.id === contextId

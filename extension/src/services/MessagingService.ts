@@ -1,23 +1,26 @@
-import {
-  AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
-  AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
-  SET_CONTEXT_SELECTION_MODE,
-  CONTEXT_SELECTED,
-} from "../messages";
+import { BaseMessage } from "../messages";
 
 type MessageListener<T> = (message: T) => void;
 
+interface ChromeMessage {
+  action: string;
+  [key: string]: unknown;
+}
+
 export class MessagingService {
-  private listeners: Map<string, MessageListener<any>[]> = new Map();
+  private listeners: Map<string, MessageListener<BaseMessage>[]> = new Map();
 
   constructor() {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener((message: BaseMessage) => {
       const listenersForAction = this.listeners.get(message.action) || [];
       listenersForAction.forEach((listener) => listener(message));
     });
   }
 
-  subscribe<T>(action: string, listener: MessageListener<T>) {
+  subscribe(
+    action: string,
+    listener: (message: BaseMessage) => void
+  ): () => void {
     if (!this.listeners.has(action)) {
       this.listeners.set(action, []);
     }
@@ -32,14 +35,11 @@ export class MessagingService {
     };
   }
 
-  sendMessage(message: { action: string; [key: string]: any }) {
+  sendMessage(message: ChromeMessage) {
     chrome.runtime.sendMessage(message);
   }
 
-  sendTabMessage(
-    tabId: number,
-    message: { action: string; [key: string]: any }
-  ) {
+  sendTabMessage(tabId: number, message: ChromeMessage) {
     chrome.tabs.sendMessage(tabId, message);
   }
 }

@@ -31,15 +31,12 @@ class BackgroundService {
       }
     );
 
-    messagingService.subscribe(
-      CONTEXT_SELECTED,
-      (message: MessageContextSelected) => {
-        messagingService.sendMessage({
-          action: AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
-          context: message.context,
-        });
-      }
-    );
+    messagingService.subscribe(CONTEXT_SELECTED, (message) => {
+      messagingService.sendMessage({
+        action: AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
+        context: message.context,
+      });
+    });
   }
 }
 
