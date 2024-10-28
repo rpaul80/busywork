@@ -1,4 +1,4 @@
-import { Agent, AgentTask, TaskState, AgentState, Context } from "../models";
+import { Agent, AgentTask, TaskState, AgentState } from "../models";
 
 export abstract class BaseAgent implements Agent {
   id: string;

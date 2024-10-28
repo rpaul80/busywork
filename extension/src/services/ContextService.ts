@@ -1,4 +1,5 @@
 import { ContextWithStatus } from "../models";
+import { messagingService } from "./MessagingService";
 import { AGENT_CONTEXT_SELECTION_MODE_REQUESTED } from "../messages";
 
 export class ContextService {
@@ -20,7 +21,7 @@ export class ContextService {
 
   // Start context selection process
   requestContextSelection(contextId: string): void {
-    chrome.runtime.sendMessage({
+    messagingService.sendMessage({
       action: AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
       contextId: contextId,
     });

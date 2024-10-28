@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Agent, AgentTask, ContextWithStatus } from '../models';
-import { AGENT_CONTEXT_SELECTION_MODE_REQUESTED, AGENT_CONTEXT_SELECTION_MODE_COMPLETED } from '../messages';
+import { AGENT_CONTEXT_SELECTION_MODE_REQUESTED } from '../messages';
 import './sidebar.css';
 import { createRoot } from 'react-dom/client';
 import { useMessageListener } from '../hooks/useMessagesListener';

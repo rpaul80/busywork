@@ -4,6 +4,8 @@ import {
   SET_CONTEXT_SELECTION_MODE,
   CONTEXT_SELECTED,
 } from "./messages";
+import { messagingService } from "./services/MessagingService";
+import { MessageContextSelected } from "./messages";
 class BackgroundService {
   constructor() {
     this.setupListeners();
@@ -17,40 +19,25 @@ class BackgroundService {
   }
 
   private setupListeners() {
-    // add a listener for messages from the sidebar
-    // when user clicks add context in the sidebar, it will send a message here
-    // at this page will be in a state so that the user can select the context
-    console.log("service worker setup listeners");
-
-    chrome.runtime.onMessage.addListener(
-      async (message, sender, sendResponse) => {
-        console.log("service worker got message", message);
-
-        switch (message.action) {
-          case AGENT_CONTEXT_SELECTION_MODE_REQUESTED:
-            // dispatch to the conten script in the active tab
-            const activeTab = await this.getCurrentTab();
-            console.log("service worker got active tab", activeTab);
-            if (activeTab && activeTab.id) {
-              console.log("service worker sending message to content script");
-              chrome.tabs.sendMessage(activeTab.id, {
-                action: SET_CONTEXT_SELECTION_MODE,
-              });
-            }
-            break;
-          case CONTEXT_SELECTED:
-            console.log("service worker got context selected", message.context);
-
-            // send a message back to the sidebar to let it know that the context has been selected
-            chrome.runtime.sendMessage({
-              action: AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
-              context: message.context,
-            });
-            break;
-          default:
-            console.log("service worker got unknown message", message);
-            break;
+    messagingService.subscribe(
+      AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
+      async (message) => {
+        const activeTab = await this.getCurrentTab();
+        if (activeTab?.id) {
+          messagingService.sendTabMessage(activeTab.id, {
+            action: SET_CONTEXT_SELECTION_MODE,
+          });
         }
+      }
+    );
+
+    messagingService.subscribe(
+      CONTEXT_SELECTED,
+      (message: MessageContextSelected) => {
+        messagingService.sendMessage({
+          action: AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
+          context: message.context,
+        });
       }
     );
   }

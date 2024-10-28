@@ -1,6 +1,10 @@
 import { useEffect } from "react";
-import { AGENT_CONTEXT_SELECTION_MODE_COMPLETED } from "../messages";
+import {
+  AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
+  MessageAgentContextSelectionModeCompleted,
+} from "../messages";
 import { ContextWithStatus } from "../models";
+import { messagingService } from "../services/MessagingService";
 
 export function useMessageListener(
   contextId: string | undefined,
@@ -9,9 +13,9 @@ export function useMessageListener(
   useEffect(() => {
     if (!contextId) return;
 
-    const messageListener = (message: any, sender: any, sendResponse: any) => {
-      console.log("message listener got message", message);
-      if (message.action === AGENT_CONTEXT_SELECTION_MODE_COMPLETED) {
+    const unsubscribe = messagingService.subscribe(
+      AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
+      (message: MessageAgentContextSelectionModeCompleted) => {
         setContexts((prevContexts) =>
           prevContexts.map((context) =>
             context.id === contextId
@@ -20,13 +24,8 @@ export function useMessageListener(
           )
         );
       }
-    };
+    );
 
-    chrome.runtime.onMessage.addListener(messageListener);
-
-    // Cleanup listener when component unmounts or contextId changes
-    return () => {
-      chrome.runtime.onMessage.removeListener(messageListener);
-    };
+    return () => unsubscribe();
   }, [contextId, setContexts]);
 }

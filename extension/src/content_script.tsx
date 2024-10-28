@@ -23,7 +23,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-
 function enableContextSelectionMode() {
     let hoveredElement: Element | null = null;
 

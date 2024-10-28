@@ -21,7 +21,7 @@ export function useAgents() {
     };
 
     fetchAgents();
-  }, []);
+  }, [service]);
 
   return { agents, isLoading, error };
 }

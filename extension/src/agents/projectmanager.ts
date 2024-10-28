@@ -1,5 +1,5 @@
 import { BaseAgent } from "./agents";
-import { AgentTask, TaskState } from "../models";
+import { TaskState } from "../models";
 
 export class ProjectManagerAgent extends BaseAgent {
   constructor() {
