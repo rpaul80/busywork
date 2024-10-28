@@ -1,4 +1,3 @@
-import AgentService from "./services/AgentService";
 import {
   AGENT_CONTEXT_SELECTION_MODE_REQUESTED,
   AGENT_CONTEXT_SELECTION_MODE_COMPLETED,
@@ -6,10 +5,7 @@ import {
   CONTEXT_SELECTED,
 } from "./messages";
 class BackgroundService {
-  private agentsService: AgentService;
-
-  constructor(agentsService: AgentService) {
-    this.agentsService = agentsService;
+  constructor() {
     this.setupListeners();
   }
 
@@ -60,7 +56,7 @@ class BackgroundService {
   }
 }
 
-new BackgroundService(new AgentService());
+new BackgroundService();
 
 // Allows users to open the side panel by clicking on the action toolbar icon
 //@ts-ignore
