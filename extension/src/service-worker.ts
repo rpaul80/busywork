@@ -5,7 +5,6 @@ import {
   CONTEXT_SELECTED,
 } from "./messages";
 import { messagingService } from "./services/MessagingService";
-import { MessageContextSelected } from "./messages";
 class BackgroundService {
   constructor() {
     this.setupListeners();
