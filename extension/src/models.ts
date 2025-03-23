@@ -32,6 +32,9 @@ export interface Agent {
   name: string;
   state: AgentState;
   tasks: AgentTask[];
+
+  startTask(taskId: string): boolean;
+  completeTask(task: string): void;
 }
 
 export interface ContextMenuEvent {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Agent, AgentTask, ContextWithStatus } from '../models';
 import { AGENT_CONTEXT_SELECTION_MODE_REQUESTED } from '../messages';
 import './sidebar.css';
@@ -9,14 +9,32 @@ import TaskList from './TaskList';
 import ContextList from './ContextList';
 import { Loading } from './common/Loading';
 import { Error } from './common/Error';
+import AgentTaskService from "../services/AgentTaskService"
 
 const AgentList: React.FC = () => {
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [selectedTask, setSelectedTask] = useState<AgentTask | null>(null);
     const [contexts, setContexts] = useState<ContextWithStatus[]>([]);
     const [selectingContextId, setSelectingContextId] = useState<string | undefined>();
-    useMessageListener(selectingContextId, setContexts);
     const { agents, isLoading, error } = useAgents();
+
+    useMessageListener(selectingContextId, setContexts);
+
+    const handleRunTask = async () => {
+        if (!selectedAgent || !selectedTask) return;
+
+        const taskService = new AgentTaskService(selectedAgent);
+        try {
+            await taskService.runTask(
+                selectedTask,
+                contexts
+            );
+        } catch (error) {
+            console.error("Failed to run task:", error);
+            // TODO: Add error handling UI
+        }
+    };
+
 
     const handleAgentClick = (agent: Agent) => {
         setSelectedAgent(agent);
@@ -77,7 +95,7 @@ const AgentList: React.FC = () => {
                 <div className="task-details">
                     <h4>{selectedTask.name}</h4>
                     <ContextList contexts={contexts} onAddContext={handleAddContext} />
-                    <input type="button" onClick={() => alert("create the prompt and submit it here")} value="Submit" />
+                    <input type="button" onClick={() => handleRunTask()} value="Submit" />
                 </div>
             )}
         </div>
