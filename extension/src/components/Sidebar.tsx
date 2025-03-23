@@ -77,6 +77,7 @@ const AgentList: React.FC = () => {
                 <div className="task-details">
                     <h4>{selectedTask.name}</h4>
                     <ContextList contexts={contexts} onAddContext={handleAddContext} />
+                    <input type="button" onClick={() => alert("create the prompt and submit it here")} value="Submit" />
                 </div>
             )}
         </div>

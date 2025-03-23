@@ -15,6 +15,7 @@ export interface Context {
   name: string;
   type: string;
   data: any;
+  prompt: string;
 }
 
 export interface AgentTask {
@@ -23,6 +24,7 @@ export interface AgentTask {
   requiredContexts: Context[];
   state: TaskState;
   contexts: Context[];
+  prompt: string;
 }
 
 export interface Agent {
