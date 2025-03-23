@@ -17,21 +17,24 @@ export abstract class BaseAgent implements Agent {
     return this.tasks;
   }
 
-  startTask(taskId: string): boolean {
+  private updateTaskState(taskId: string, newState: TaskState): boolean {
     const task = this.tasks.find((t) => t.id === taskId);
-    if (task && task.state === TaskState.WaitingForContext) {
-      task.state = TaskState.Working;
-      this.state = AgentState.Working;
-      return true;
-    }
-    return false;
+    if (!task) return false;
+
+    task.state = newState;
+    this.state =
+      newState === TaskState.Working ? AgentState.Working : AgentState.Idle;
+    return true;
   }
 
-  completeTask(taskId: string): void {
+  startTask(taskId: string): boolean {
     const task = this.tasks.find((t) => t.id === taskId);
-    if (task) {
-      task.state = TaskState.Complete;
-      this.state = AgentState.Idle;
-    }
+    if (!task || task.state !== TaskState.WaitingForContext) return false;
+
+    return this.updateTaskState(taskId, TaskState.Working);
+  }
+
+  completeTask(taskId: string): boolean {
+    return this.updateTaskState(taskId, TaskState.Complete);
   }
 }
