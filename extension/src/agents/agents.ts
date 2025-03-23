@@ -27,11 +27,28 @@ export abstract class BaseAgent implements Agent {
     return true;
   }
 
-  startTask(taskId: string): boolean {
+  protected abstract executeTask(taskId: string): Promise<boolean>;
+
+  async startTask(taskId: string): Promise<boolean> {
     const task = this.tasks.find((t) => t.id === taskId);
     if (!task || task.state !== TaskState.WaitingForContext) return false;
 
-    return this.updateTaskState(taskId, TaskState.Working);
+    if (!this.updateTaskState(taskId, TaskState.Working)) return false;
+
+    try {
+      const success = await this.executeTask(taskId);
+
+      if (success) {
+        this.updateTaskState(taskId, TaskState.Complete);
+      } else {
+        this.updateTaskState(taskId, TaskState.Failed);
+      }
+
+      return success;
+    } catch (error) {
+      this.updateTaskState(taskId, TaskState.Failed);
+      return false;
+    }
   }
 
   completeTask(taskId: string): boolean {

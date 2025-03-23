@@ -15,30 +15,15 @@ export default class AgentTaskService {
     }
 
     try {
-      // Update task state to working
-      task.state = TaskState.Working;
+      // Update task with contexts
       task.contexts = contexts;
 
-      // Start the task on the agent
-      this.agent.startTask(task.id);
+      // Start the task on the agent - this will trigger executeTask
+      const success = await this.agent.startTask(task.id);
 
-      // TODO: Implement actual task execution logic here
-      // This would involve:
-      // 1. Creating the prompt using task.prompt and contexts
-      // 2. Sending to LLM
-      // 3. Processing response
-
-      alert(
-        "prompt LLM with overall prompt of:" +
-          task.prompt +
-          "context Names" +
-          task.contexts.length +
-          "contexts" +
-          task.contexts.map((c) => c.prompt + " " + c.data)
-      );
-
-      // Mark task as complete
-      this.agent.completeTask(task.id);
+      if (!success) {
+        throw new Error("Failed to execute task");
+      }
 
       // Broadcast completion
       chrome.runtime.sendMessage({

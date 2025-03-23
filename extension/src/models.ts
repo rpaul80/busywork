@@ -8,6 +8,7 @@ export enum TaskState {
   Working,
   InReview,
   Complete,
+  Failed,
 }
 
 export interface Context {
@@ -33,8 +34,8 @@ export interface Agent {
   state: AgentState;
   tasks: AgentTask[];
 
-  startTask(taskId: string): boolean;
-  completeTask(task: string): void;
+  startTask(taskId: string): Promise<boolean>;
+  completeTask(taskId: string): boolean;
 }
 
 export interface ContextMenuEvent {

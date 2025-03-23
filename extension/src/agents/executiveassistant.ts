@@ -27,19 +27,38 @@ export class ExecutiveAssistantAgent extends BaseAgent {
           name: "Golden Signals",
           type: "document",
           data: {},
-          prompt:
-            "Golden Signals, examine these to determine if there are are any blips",
+          prompt: "prompt 1",
         },
         {
           id: "teamhealth",
           name: "Team Health",
           type: "document",
           data: {},
-          prompt: "",
+          prompt: "prompt 2",
         },
       ],
       state: TaskState.WaitingForContext,
       contexts: [],
     });
+  }
+
+  protected async executeTask(taskId: string): Promise<boolean> {
+    const task = this.tasks.find((t) => t.id === taskId);
+    if (!task) return false;
+
+    alert(
+      "now we can handle the llm thing here " +
+        task.contexts.map((c) => c.prompt)
+    );
+
+    try {
+      // TODO: Implement actual LLM call here
+      // For now, we'll just simulate a successful execution
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return true;
+    } catch (error) {
+      console.error(`Failed to execute task ${taskId}:`, error);
+      return false;
+    }
   }
 }
