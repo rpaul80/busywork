@@ -1,13 +1,16 @@
 import React from "react";
 import { ContextWithStatus } from "../models";
-import { contextService } from '../services/ContextService';
+import { contextService } from "../services/ContextService";
 
 interface ContextListProps {
     contexts: ContextWithStatus[];
     onAddContext: (contextId: string) => void;
 }
 
-const renderContextDetails = (context: ContextWithStatus, onAddContext: (contextId: string) => void) => {
+const renderContextDetails = (
+    context: ContextWithStatus,
+    onAddContext: (contextId: string) => void
+) => {
     return (
         <div className="context-details">
             <h5>{context.name}</h5>
@@ -30,7 +33,10 @@ const renderContextDetails = (context: ContextWithStatus, onAddContext: (context
     );
 };
 
-const ContextList: React.FC<ContextListProps> = ({ contexts, onAddContext }) => {
+const ContextList: React.FC<ContextListProps> = ({
+    contexts,
+    onAddContext,
+}) => {
     return (
         <div className="context-list">
             <h5>Required Contexts</h5>

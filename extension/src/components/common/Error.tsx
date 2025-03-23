@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 interface ErrorProps {
-    message: string;
+  message: string;
 }
 
 export const Error: React.FC<ErrorProps> = ({ message }) => (
-    <div className="error">{message}</div>
+  <div className="error">{message}</div>
 );
