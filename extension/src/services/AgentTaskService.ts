@@ -1,6 +1,6 @@
 // an Agent has many tasks. This service is responsible for running a task, and broadcasting when it's complete
 
-import { Agent, AgentTask, Context, TaskState } from "../models";
+import { Agent, AgentTask, Context } from "../models";
 
 export default class AgentTaskService {
   private agent: Agent;
@@ -24,13 +24,6 @@ export default class AgentTaskService {
       if (!success) {
         throw new Error("Failed to execute task");
       }
-
-      // Broadcast completion
-      chrome.runtime.sendMessage({
-        action: "TASK_COMPLETED",
-        taskId: task.id,
-        agentId: this.agent.id,
-      });
     } catch (error) {
       console.error("Error running task:", error);
       throw error;
