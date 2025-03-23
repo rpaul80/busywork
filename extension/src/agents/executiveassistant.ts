@@ -6,7 +6,7 @@ export class ExecutiveAssistantAgent extends BaseAgent {
     super("ea", "Executive Assistant");
     this.tasks.push({
       id: "summarize_document",
-      name: "SummarizeDocument",
+      name: "Summarize Document",
       requiredContexts: [
         {
           id: "document",
